@@ -1043,7 +1043,7 @@ __init()
 # result returned by the get() method directly.
 try:
   __emptyPhoto = tk.PhotoImage(width=1, height=1)
-  __emptyPhoto.get(0,0).split()
+  __emptyPhoto.get(0,0).split() 
 
   def getPixel(img, x, y):
     parts = img.get(x, y).split()

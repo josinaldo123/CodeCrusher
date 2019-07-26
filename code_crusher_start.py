@@ -12,6 +12,7 @@ import inspect
 import sys
 import traceback
 import os
+import pygame
 
 # Where is the 'hole' for the game board in the background image?
 HOFF = 200
@@ -96,29 +97,29 @@ def clearAll(board, sym):
 #
 #  Returns: True if the proposed swap creates a line.  False otherwise.
 #
-def vLineAt(board, line, column):
+def vLineAt(board, row, column):
   boolean = False
-  if line != None and column != None and (line>=2 or line == (len(board)-1)):
-    if (board[line][column] == board[line-1][column] and board[line][column] == board[line-2][column]):
+  if row != None and column != None and (row>=2 or row == (len(board)-1)):
+    if (board[row][column] == board[row-1][column] and board[row][column] == board[row-2][column]):
       boolean = True
-  if line != None and column != None and (line>=1 and line<(len(board)-1)):
-    if (board[line][column] == board[line+1][column] and board[line][column] == board[line-1][column]):
+  if row != None and column != None and (row>=1 and row<(len(board)-1)):
+    if (board[row][column] == board[row+1][column] and board[row][column] == board[row-1][column]):
       boolean = True
-  if line != None and column != None and (line>=0 and line<(len(board)-2)):
-    if (board[line][column] == board[line+1][column] and board[line][column] == board[line+2][column]):
+  if row != None and column != None and (row>=0 and row<(len(board)-2)):
+    if (board[row][column] == board[row+1][column] and board[row][column] == board[row+2][column]):
       boolean = True
   return boolean
 
-def hLineAt(board, line, column):
+def hLineAt(board, row, column):
   boolean = False
-  if line != None and column != None and (column>=2 or column == (len(board[line])-1)):
-    if (board[line][column] == board[line][column-1] and board[line][column] == board[line][column-2]):
+  if row != None and column != None and (column>=2 or column == (len(board[row])-1)):
+    if (board[row][column] == board[row][column-1] and board[row][column] == board[row][column-2]):
       boolean = True
-  if line != None and column != None and (column>=1 and column<(len(board[line])-1)):
-    if (board[line][column] == board[line][column-1] and board[line][column] == board[line][column+1]):
+  if row != None and column != None and (column>=1 and column<(len(board[row])-1)):
+    if (board[row][column] == board[row][column-1] and board[row][column] == board[row][column+1]):
       boolean = True
-  if line != None and column != None and (column>=0 and column<(len(board[line])-2)):
-    if (board[line][column] == board[line][column+1] and board[line][column] == board[line][column+2]):
+  if row != None and column != None and (column>=0 and column<(len(board[row])-2)):
+    if (board[row][column] == board[row][column+1] and board[row][column] == board[row][column+2]):
       boolean = True
   return boolean
           
@@ -145,7 +146,23 @@ def canSwap(board, r1, c1, r2, c2):
 #           is possible then -1, -1, -1, -1 is returned.
 
 def hint(board):
+  for r in range (len(board)):
+    for c in range (len(board[0])):
+      try:
+        if(canSwap(board, r,c, r+1, c)):
+           return r, c, r+1, c
+      except:
+        pass
+  for r in range(len(board)):
+    for c in range(len(board[0])):
+      try:
+        if(canSwap(board, r, c, r, c+1)):
+           return r, c, r, c+1
+      except:
+        pass
   return -1, -1, -1, -1
+  
+  
 
 ##############################################################################
 #
@@ -1313,8 +1330,10 @@ def play(target_score, turns_left, num_rows, num_cols, num_syms, bg, cc_m, image
   game_state = RUNNING
 
   while not closed():
+    
     clear()
     drawBoard(board, hoff, voff, selected_r, selected_c, images, sel_images)
+
 
     if len(syncAnim) == 0:
       score_factor = collapse(board, syncAnim, asyncAnim, score_factor, num_syms)
@@ -1730,12 +1749,17 @@ def drawStatus(score, score_width, target_score, turns_left):
 
 
 def main():
+  pygame.init()
+  pygame.mixer.music.load("Toques_Vingadores.wav")
+  pygame.mixer.music.play(-1)
+  
   if os.path.isfile("sprites.gif") == False:
     print("sprites.gif must be located in the same folder / directory as")
     print("your .py file.  Ensure that the name of the file is in all")
     print("lowercase letters.")
     
     quit()
+    
 
   if test_createBoard() == False:
     
@@ -1750,6 +1774,7 @@ def main():
 
   bg, images, sel_images, win_image, lose_image, cc_m, cc_b = loadSpriteSheet("sprites.gif")
   setAutoUpdate(False)
+  
   while not closed():
     clear()
     background("black")
@@ -1801,8 +1826,10 @@ def main():
     rows = 6
     cols = 7 
     syms = 6
-
+  
   play(target_score, max_turns, rows, cols, syms, bg, cc_m, images, sel_images, win_image, lose_image)
 
 main()
+
+
 
